@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module packet_builder (
     input  logic        is_read,
     input  logic [31:0] addr,

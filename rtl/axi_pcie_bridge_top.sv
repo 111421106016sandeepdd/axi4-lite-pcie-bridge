@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module axi_pcie_bridge_top (
     input  logic        clk,
     input  logic        rst,

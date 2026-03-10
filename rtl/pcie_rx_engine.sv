@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module pcie_rx_engine (
     input  logic        clk,
     input  logic        rst,
