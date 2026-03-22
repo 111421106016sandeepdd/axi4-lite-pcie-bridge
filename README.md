@@ -157,3 +157,33 @@ vvp build/axi_pcie_bridge.out
 
 gtkwave build/axi_pcie_bridge.vcd
 
+---
+
+## Results
+
+- Successfully translated AXI4-Lite read/write transactions into packetized PCIe-style requests
+- Verified correct read/write and readback behavior across multiple addresses
+- Demonstrated FIFO-based buffering between request and transmission stages
+- Validated completion-driven response handling back to AXI interface
+
+---
+
+## Testbench
+
+- Directed stimulus for AXI read and write transactions
+- Integrated memory model within RX engine for completion responses
+- Verified completion packet handling and AXI response mapping
+- Generated waveform-based validation using GTKWave
+
+---
+
+## Waveform Proof
+
+### Write Transaction Flow
+![Write Flow](screenshots/axi_pcie_write_flow.png)
+
+### Read Transaction Flow
+![Read Flow](screenshots/axi_pcie_read_transaction_flow.png)
+
+### Write → Readback Verification
+![Readback](screenshots/axi_pcie_write_readback_verification.png)
