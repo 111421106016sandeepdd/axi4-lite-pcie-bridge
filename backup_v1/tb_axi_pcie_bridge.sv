@@ -8,12 +8,11 @@ module tb_axi_pcie_bridge;
     logic [31:0] s_axi_awaddr;
     logic        s_axi_awvalid;
     logic        s_axi_awready;
-    logic [3:0] s_axi_wstrb;
-    
+
     logic [31:0] s_axi_wdata;
     logic        s_axi_wvalid;
     logic        s_axi_wready;
-    logic       pcie_tx_ready;
+
     logic [1:0]  s_axi_bresp;
     logic        s_axi_bvalid;
     logic        s_axi_bready;
@@ -34,11 +33,11 @@ module tb_axi_pcie_bridge;
         .s_axi_awaddr (s_axi_awaddr),
         .s_axi_awvalid(s_axi_awvalid),
         .s_axi_awready(s_axi_awready),
-        .s_axi_wstrb(s_axi_wstrb),
+
         .s_axi_wdata (s_axi_wdata),
         .s_axi_wvalid(s_axi_wvalid),
         .s_axi_wready(s_axi_wready),
-        .pcie_tx_ready(pcie_tx_ready),
+
         .s_axi_bresp (s_axi_bresp),
         .s_axi_bvalid(s_axi_bvalid),
         .s_axi_bready(s_axi_bready),
@@ -110,8 +109,7 @@ module tb_axi_pcie_bridge;
     initial begin
         clk = 0;
         rst = 1;
-        s_axi_wstrb = 4'hF;
-        pcie_tx_ready = 1'b1;
+
         s_axi_awaddr  = 0;
         s_axi_awvalid = 0;
         s_axi_wdata   = 0;

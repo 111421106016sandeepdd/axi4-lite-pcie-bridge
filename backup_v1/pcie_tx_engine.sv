@@ -5,11 +5,11 @@ module pcie_tx_engine (
 
     input  logic        packet_valid,
     output logic        packet_ready,
-    input  logic [75:0] packet_data,
+    input  logic [67:0] packet_data,
 
     output logic        pcie_tx_valid,
     input  logic        pcie_tx_ready,
-    output logic [75:0] pcie_tx_data
+    output logic [67:0] pcie_tx_data
 );
 
     always_ff @(posedge clk or posedge rst) begin

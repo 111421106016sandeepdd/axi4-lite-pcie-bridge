@@ -3,21 +3,27 @@ module packet_builder (
     input  logic        is_read,
     input  logic [31:0] addr,
     input  logic [31:0] wdata,
-    output logic [67:0] packet
+    input  logic [3:0]  wstrb,
+    input  logic [3:0]  tag,
+    output logic [75:0] packet
 );
-    // Packet format:
-    // [67:64] = type
+    // Simplified internal PCIe-style packet format
+    // [75:72] = tag
+    // [71:68] = write strobe / reserved
+    // [67:64] = packet type
     // [63:32] = address
     // [31:0]  = data
     //
-    // type = 4'h1 -> write
-    // type = 4'h2 -> read
+    // 4'h1 = Memory Write Request
+    // 4'h2 = Memory Read Request
+    // 4'h8 = Completion without Data
+    // 4'h9 = Completion with Data
 
     always_comb begin
         if (is_read)
-            packet = {4'h2, addr, 32'h0000_0000};
+            packet = {tag, 4'h0, 4'h2, addr, 32'h0000_0000};
         else
-            packet = {4'h1, addr, wdata};
+            packet = {tag, wstrb, 4'h1, addr, wdata};
     end
 
 endmodule

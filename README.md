@@ -1,78 +1,159 @@
-# AXI4-Lite to PCIe-Style Bridge | Verilog
+# AXI4-Lite to PCIe-Style Transaction Bridge in Verilog
 
 ## Overview
-This project implements a simplified AXI4-Lite to PCIe-style bridge in Verilog. The design accepts AXI memory read/write transactions, converts them into packetized PCIe-style transfers, and returns responses back to the AXI side.
+This project implements a simplified AXI4-Lite to PCIe-style transaction bridge in Verilog. It converts AXI memory-mapped read/write requests into internal packetized transactions and returns completion responses back to the AXI interface.
 
-The project demonstrates protocol translation, handshake-based communication, FSM-based control logic, and simulation-based verification.
+The design models transaction-layer behavior including buffering, FSM control, and completion handling.
+
+---
 
 ## Architecture
-The bridge consists of the following blocks:
 
-- AXI request capture logic
-- Packet builder
-- PCIe transmit engine
-- PCIe receive engine with simple memory model
-- AXI response generation logic
+AXI → Packet Builder → FIFO → TX Engine → RX Engine → Completion Manager → AXI Response
 
-### Block Flow
-AXI Interface -> Request Capture -> Packet Builder -> PCIe TX Engine -> PCIe RX Engine -> AXI Response
+### Key Components
+- AXI4-Lite Slave Interface
+- Packet Builder (internal PCIe-style format)
+- FIFO Buffer (decouples AXI and TX)
+- TX Engine (handles packet transmission)
+- RX Engine (models memory + completion)
+- Completion Manager (maps responses to AXI)
+- Config Registers (address range control)
+
+---
 
 ## Packet Format
-The bridge uses a simplified PCIe-style packet format:
 
-[67:64] : packet type  
-[63:32] : address  
-[31:0]  : data  
+| Field        | Bits       |
+|-------------|-----------|
+| Tag         | [75:72]   |
+| Byte Enable | [71:68]   |
+| Type        | [67:64]   |
+| Address     | [63:32]   |
+| Data        | [31:0]    |
 
 ### Packet Types
-4'h1 : Write request  
-4'h2 : Read request  
+- `4'h1` → Write Request  
+- `4'h2` → Read Request  
+- `4'h8` → Completion (no data)  
+- `4'h9` → Completion (with data)  
+- `4'hF` → Error  
 
-## FSM Design
-The top-level control logic uses a 3-state FSM:
-
-IDLE      : Waits for AXI request  
-SEND_PKT  : Generates and sends packet  
-WAIT_RESP : Waits for PCIe response  
+---
 
 ## Verification
-The testbench verifies:
 
-1. Read from empty memory returns 0  
-2. Write to address 0x10 and read back 0x1234ABCD  
-3. Write to address 0x20 and read back 0xDEADBEEF  
+### Functional Tests
+- Read from empty memory → returns 0  
+- Write → Readback verification  
+- Multiple address transactions  
 
-## Simulation
+### Design Features Verified
+- FIFO buffering  
+- Completion-based response handling  
+- Address range filtering  
 
-Compile:
+---
 
-iverilog -g2012 -Wall \
--o build/axi_pcie_bridge.out \
-rtl/packet_builder.sv \
-rtl/pcie_tx_engine.sv \
-rtl/pcie_rx_engine.sv \
-rtl/axi_pcie_bridge_top.sv \
-tb/tb_axi_pcie_bridge.sv
+## Waveform Proof
 
-Run:
+### Write Transaction Flow
+![Write Flow](screenshots/axi_pcie_write_flow.png)
+
+### Read Transaction Flow
+![Read Flow](screenshots/axi_pcie_read_transaction_flow.png)
+
+### Write → Readback Verification
+![Readback](screenshots/axi_pcie_write_readback_verification.png)
+
+---
+
+## How to Run
+
+```bash
+iverilog -g2012 -Wall -o build/axi_pcie_bridge.out \
+rtl/*.sv tb/*.sv
 
 vvp build/axi_pcie_bridge.out
 
-Waveform:
+gtkwave build/axi_pcie_bridge.vcd
+# AXI4-Lite to PCIe-Style Transaction Bridge in Verilog
+
+## Overview
+This project implements a simplified AXI4-Lite to PCIe-style transaction bridge in Verilog. It converts AXI memory-mapped read/write requests into internal packetized transactions and returns completion responses back to the AXI interface.
+
+The design models transaction-layer behavior including buffering, FSM control, and completion handling.
+
+---
+
+## Architecture
+
+AXI → Packet Builder → FIFO → TX Engine → RX Engine → Completion Manager → AXI Response
+
+### Key Components
+- AXI4-Lite Slave Interface
+- Packet Builder (internal PCIe-style format)
+- FIFO Buffer (decouples AXI and TX)
+- TX Engine (handles packet transmission)
+- RX Engine (models memory + completion)
+- Completion Manager (maps responses to AXI)
+- Config Registers (address range control)
+
+---
+
+## Packet Format
+
+| Field        | Bits       |
+|-------------|-----------|
+| Tag         | [75:72]   |
+| Byte Enable | [71:68]   |
+| Type        | [67:64]   |
+| Address     | [63:32]   |
+| Data        | [31:0]    |
+
+### Packet Types
+- `4'h1` → Write Request  
+- `4'h2` → Read Request  
+- `4'h8` → Completion (no data)  
+- `4'h9` → Completion (with data)  
+- `4'hF` → Error  
+
+---
+
+## Verification
+
+### Functional Tests
+- Read from empty memory → returns 0  
+- Write → Readback verification  
+- Multiple address transactions  
+
+### Design Features Verified
+- FIFO buffering  
+- Completion-based response handling  
+- Address range filtering  
+
+---
+
+## Waveform Proof
+
+### Write Transaction Flow
+![Write Flow](screenshots/axi_pcie_write_flow.png)
+
+### Read Transaction Flow
+![Read Flow](screenshots/axi_pcie_read_transaction_flow.png)
+
+### Write → Readback Verification
+![Readback](screenshots/axi_pcie_write_readback_verification.png)
+
+---
+
+## How to Run
+
+```bash
+iverilog -g2012 -Wall -o build/axi_pcie_bridge.out \
+rtl/*.sv tb/*.sv
+
+vvp build/axi_pcie_bridge.out
 
 gtkwave build/axi_pcie_bridge.vcd
 
-## Files
-
-rtl/packet_builder.sv  
-rtl/pcie_tx_engine.sv  
-rtl/pcie_rx_engine.sv  
-rtl/axi_pcie_bridge_top.sv  
-tb/tb_axi_pcie_bridge.sv  
-
-## Future Improvements
-
-- Support burst transactions  
-- Add backpressure testing  
-- Expand packet format  
-- Add error responses
