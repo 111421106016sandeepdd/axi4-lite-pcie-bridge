@@ -19,7 +19,8 @@ AXI → Packet Builder → FIFO → TX Engine → RX Engine → Completion Manag
 - RX Engine (models memory + completion)
 - Completion Manager (maps responses to AXI)
 - Config Registers (address range control)
-
+### Block Diagram
+AXI → Packet Builder → FIFO → TX → RX → Completion → AXI Response
 ---
 
 ## Packet Format
